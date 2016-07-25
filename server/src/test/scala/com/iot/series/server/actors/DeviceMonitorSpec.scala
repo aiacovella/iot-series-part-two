@@ -3,12 +3,12 @@ package com.iot.series.server.actors
 import akka.actor._
 import akka.testkit.{TestKit, TestProbe}
 import com.iot.series.server.{DeviceConfiguration, Settings, UnitSpec}
-import com.sandinh.paho.akka.MqttPubSub.PSConfig
 import com.typesafe.config.ConfigFactory
 import java.time.Instant
 import java.util.UUID
 
 import com.iot.series.server.actors.DeviceMonitor.Protocol.{DeviceDataReceived, MonitoringInitialized}
+import com.sandinh.paho.akka.PSConfig
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.mock.MockitoSugar
@@ -39,7 +39,7 @@ class DeviceMonitorSpec
 
   "DeviceMonitor" must {
     "dispatch a message to any configured listeners when it receives new device data" in new Ctx {
-      probe.expectMsg(MonitoringInitialized(deviceId))
+      probe.expectMsg(5 seconds, MonitoringInitialized(deviceId))
 
       val message = buildMessage(deviceId, DeviceValueOne.toString)
 

@@ -88,11 +88,11 @@ This is the first in a series of projects to demonstrate building out an Interne
 	node device.js
 	```
 	
-	At this point you should be seeing the mock device data appear in the terminal in which you executed the subscribe command. If this is working, you can continue. 
+	At this point you should be seeing the mock device data appear in the terminal in which you executed the subscribe command. If this is working, you can terminate the device.js script and continue. 
 	
 * Running the application
 
-  Navigate to the "server" subdirectory underneith the directory you checked out from github and execute the following:
+  Navigate to the "server" subdirectory below the directory you checked out from github and execute the following:
   
   ```
   sbt run

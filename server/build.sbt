@@ -19,7 +19,7 @@ libraryDependencies ++= {
   val MockitoVersion                  = "1.10.19"
   val MoquetteVersion                 = "0.8.1"
   val PahoClientVersion               = "1.0.2"
-  val PahoVersion                     = "1.2.0-CHARIOT-FORK-REV-1"
+  val PahoVersion                     = "1.3.0"
 
   Seq(
     "ch.qos.logback"                              % "logback-classic"                   % LogbackVersion,
@@ -32,7 +32,7 @@ libraryDependencies ++= {
     "io.netty"                                    % "netty"                               % NettyVersion,
     "io.netty"                                    % "netty-handler"                       % NettyHandlerVersion,
     "org.eclipse.paho"                            % "org.eclipse.paho.client.mqttv3"      % PahoClientVersion,
-
+    "com.sandinh"                                 % "paho-akka_2.11"                      % PahoVersion,
     "com.typesafe.akka"                          %% "akka-testkit"                        % AkkaVersion                    % "test, provided",
     "io.moquette"                                 % "moquette-broker"                     % MoquetteVersion                % "test, provided",
     "org.mockito"                                 % "mockito-core"                        % MockitoVersion                 % "test, provided",

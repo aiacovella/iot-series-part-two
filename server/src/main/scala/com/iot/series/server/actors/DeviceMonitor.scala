@@ -3,10 +3,9 @@ package com.iot.series.server.actors
 import akka.actor._
 import com.iot.series.server.actors.DeviceMonitor.Protocol._
 import com.iot.series.server.Settings
-import com.sandinh.paho.akka.MqttPubSub._
 import java.time.Instant
 
-import com.sandinh.paho.akka.MqttPubSub
+import com.sandinh.paho.akka._
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -28,7 +27,7 @@ class DeviceMonitor(
 
   private val subscriberActor: ActorRef = {
     log.info("Broker Configuration: " + settings.messageBrokerConfig)
-    context.actorOf(Props(new MqttPubSub(settings.messageBrokerConfig, Some(self))),"device-monitor-supervisor-subscriber")
+    context.actorOf(Props(new MqttPubSub(settings.messageBrokerConfig)),"device-monitor-supervisor-subscriber")
   }
 
   context.system.scheduler.scheduleOnce(1.second, self, SubscribeToTopic)
@@ -54,20 +53,28 @@ class DeviceMonitor(
       // Resubscribe if we haven't received a subscription ack yet.
       context.system.scheduler.scheduleOnce(1.second, self, SubscribeToTopic)
 
-    case SubscribeSuccess ⇒
-      log.debug(s"${self.path} is subscribed to topic $deviceId")
+    case SubscribeAck(_, fail) =>
+      fail match {
+        case Some(err) ⇒
+          // The Paho-Akka library should have returned a Try here rather than an option of error.
+          log.error(s"Subscription to MQTT server failed for device $deviceId. Re-attempting connection.")
 
-      // Reset timeout to infinite.
-      context.setReceiveTimeout(Duration.Undefined)
-      dispatchEvent(MonitoringInitialized(deviceId))
-      context.become(initialized)
+          context.system.scheduler.scheduleOnce(5.seconds, self, SubscribeToTopic)
 
+        case None ⇒
+          log.debug(s"${self.path} is subscribed to topic $deviceId")
+
+          // Reset timeout to infinite.
+          context.setReceiveTimeout(Duration.Undefined)
+          dispatchEvent(MonitoringInitialized(deviceId))
+          context.become(initialized)
+      }
   }
 
   def initialized: Receive = {
     case msg: Message =>
       parseMessage(msg).foreach{event ⇒
-        log.debug(s"Received device data ${event.value}")
+        log.debug(s"Received device data ${event.value} for device ${deviceId}")
         dispatchEvent(event)
       }
 
